@@ -8,11 +8,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import edu.cnm.deepdive.quotes.R;
+import edu.cnm.deepdive.quotes.model.entity.Quote;
 import edu.cnm.deepdive.quotes.model.pojo.QuoteWithSource;
 import edu.cnm.deepdive.quotes.view.QuoteAdapter.Holder;
 import java.util.List;
-import java.util.TreeMap;
-import org.w3c.dom.Text;
 
 public class QuoteAdapter extends RecyclerView.Adapter<Holder> {
 
@@ -21,13 +20,16 @@ public class QuoteAdapter extends RecyclerView.Adapter<Holder> {
   private final String sourceFormat;
   private final Context context;
   private final List<QuoteWithSource> quotes;
+  private final OnClickListener clickListener;
 
-  public QuoteAdapter(Context context, List<QuoteWithSource> quotes) {
+  public QuoteAdapter(Context context, List<QuoteWithSource> quotes,
+      OnClickListener clickListener) {
     super();
     this.context = context;
     this.quotes = quotes;
     unattributedSource = context.getString(R.string.unattributed_source);
     sourceFormat = context.getString(R.string.source_format);
+    this.clickListener = clickListener;
   }
 
   @NonNull
@@ -50,11 +52,13 @@ public class QuoteAdapter extends RecyclerView.Adapter<Holder> {
 
   class Holder extends RecyclerView.ViewHolder {
 
+    private final View itemView;
     private final TextView quote;
     private final TextView source;
 
     public Holder(@NonNull View itemView) {
       super(itemView);
+      this.itemView = itemView;
       quote = itemView.findViewById(R.id.quote);
       source = itemView.findViewById(R.id.source);
     }
@@ -65,9 +69,15 @@ public class QuoteAdapter extends RecyclerView.Adapter<Holder> {
           (item.getSource() != null) ? item.getSource().getName() : unattributedSource ;
       quote.setText(item.getText());
       source.setText(String.format(sourceFormat, sourceName));
+      itemView.setOnClickListener((v) -> clickListener.onClick(v, getAdapterPosition(), item));
 
     }
 
   }
 
+
+  public interface  OnClickListener {
+
+    void onClick(View v, int position, QuoteWithSource quote);
+}
 }
